@@ -179,8 +179,8 @@ class JSON(BaseHTTPQueryRunner):
             if 'url' not in query:
                 raise QueryParseError("Query must include 'url' option.")
 
-            if is_private_address(query['url']):
-                raise Exception("Can't query private addresses.")
+            # if is_private_address(query['url']):
+            #     raise Exception("Can't query private addresses.")
 
             method = query.get('method', 'get')
             request_options = project(
