@@ -24,6 +24,13 @@ def get_google_auth_url(next_path):
         google_auth_url = url_for('google_oauth.authorize', next=next_path)
     return google_auth_url
 
+def get_wso2_auth_url(next_path):
+    if settings.MULTI_ORG:
+        wso2_auth_url = url_for('WSO2_oauth.authorize_org', next=next_path, org_slug=current_org.slug)
+    else:
+        wso2_auth_url = url_for('WSO2_oauth.authorize', next=next_path)
+    return wso2_auth_url
+
 
 def render_token_login_page(template, org_slug, token, invite):
     try:
@@ -64,10 +71,13 @@ def render_token_login_page(template, org_slug, token, invite):
             return redirect(url_for('redash.index', org_slug=org_slug))
 
     google_auth_url = get_google_auth_url(url_for('redash.index', org_slug=org_slug))
+    wso2_auth_url = get_wso2_auth_url(url_for('redash.index', org_slug=org_slug))
 
     return render_template(template,
                            show_google_openid=settings.GOOGLE_OAUTH_ENABLED,
                            google_auth_url=google_auth_url,
+                           show_wso2_openid=settings.WSO2_OAUTH_ENABLED,
+                           wso2_auth_url=wso2_auth_url,
                            show_saml_login=current_org.get_setting('auth_saml_enabled'),
                            show_remote_user_login=settings.REMOTE_USER_LOGIN_ENABLED,
                            show_ldap_login=settings.LDAP_LOGIN_ENABLED,
@@ -165,6 +175,7 @@ def login(org_slug=None):
             flash("Wrong email or password.")
 
     google_auth_url = get_google_auth_url(next_path)
+    wso2_auth_url = get_wso2_auth_url(next_path)
 
     return render_template("login.html",
                            org_slug=org_slug,
@@ -172,6 +183,8 @@ def login(org_slug=None):
                            email=request.form.get('email', ''),
                            show_google_openid=settings.GOOGLE_OAUTH_ENABLED,
                            google_auth_url=google_auth_url,
+                           show_wso2_openid=settings.WSO2_OAUTH_ENABLED,
+                           wso2_auth_url=wso2_auth_url,
                            show_password_login=current_org.get_setting('auth_password_login_enabled'),
                            show_saml_login=current_org.get_setting('auth_saml_enabled'),
                            show_remote_user_login=settings.REMOTE_USER_LOGIN_ENABLED,
@@ -232,6 +245,7 @@ def client_config():
         'dashboardRefreshIntervals': settings.DASHBOARD_REFRESH_INTERVALS,
         'queryRefreshIntervals': settings.QUERY_REFRESH_INTERVALS,
         'googleLoginEnabled': settings.GOOGLE_OAUTH_ENABLED,
+        'wso2LoginEnabled': settings.WSO2_OAUTH_ENABLED,
         'pageSize': settings.PAGE_SIZE,
         'pageSizeOptions': settings.PAGE_SIZE_OPTIONS,
         'tableCellMaxJSONSize': settings.TABLE_CELL_MAX_JSON_SIZE,

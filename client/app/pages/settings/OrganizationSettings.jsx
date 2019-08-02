@@ -36,7 +36,7 @@ class OrganizationSettings extends React.Component {
     });
   }
 
-  disablePasswordLoginToggle = () => !(clientConfig.googleLoginEnabled || this.state.formValues.auth_saml_enabled);
+  disablePasswordLoginToggle = () => !(clientConfig.wso2LoginEnabled || clientConfig.googleLoginEnabled || this.state.formValues.auth_saml_enabled);
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -76,6 +76,34 @@ class OrganizationSettings extends React.Component {
               <p>
                 Any user registered with a <strong>{join(formValues.auth_google_apps_domains, ', ')}</strong>{' '}
                 Google Apps account will be able to login. If they don{'\''}t have an existing user,
+                a new user will be created and join the <strong>Default</strong> group.
+              </p>
+            )}
+            className="m-t-15"
+          />
+          )}
+        </Form.Item>
+      </React.Fragment>
+    );
+  }
+
+  renderWSO2LoginOptions() {
+    const { formValues } = this.state;
+    return (
+      <React.Fragment>
+        <h4>WSO2 Login</h4>
+        <Form.Item label="Allowed WSO2 Apps Domains">
+          <Select
+            mode="tags"
+            value={formValues.auth_wso2_apps_domains}
+            onChange={value => this.handleChange('auth_wso2_apps_domains', value)}
+          />
+          {!isEmpty(formValues.auth_wso2_apps_domains) && (
+          <Alert
+            message={(
+              <p>
+                Any user registered with a <strong>{join(formValues.auth_wso2_apps_domains, ', ')}</strong>{' '}
+                WSO2 Apps account will be able to login. If they don{'\''}t have an existing user,
                 a new user will be created and join the <strong>Default</strong> group.
               </p>
             )}
@@ -209,6 +237,7 @@ class OrganizationSettings extends React.Component {
           </Checkbox>
         </Form.Item>
         {clientConfig.googleLoginEnabled && this.renderGoogleLoginOptions()}
+        {clientConfig.wso2LoginEnabled && this.renderWSO2LoginOptions()}
         {this.renderSAMLOptions()}
       </React.Fragment>
     );
