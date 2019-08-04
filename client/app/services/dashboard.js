@@ -6,9 +6,9 @@ export let Dashboard = null; // eslint-disable-line import/no-mutable-exports
 
 export function collectDashboardFilters(dashboard, queryResults, urlParams) {
   const filters = {};
-  queryResults.forEach((queryResult) => {
-    const queryFilters = queryResult.getFilters();
-    queryFilters.forEach((queryFilter) => {
+  _.each(queryResults, (queryResult) => {
+    const queryFilters = queryResult ? queryResult.getFilters() : [];
+    _.each(queryFilters, (queryFilter) => {
       const hasQueryStringValue = _.has(urlParams, queryFilter.name);
 
       if (!(hasQueryStringValue || dashboard.dashboard_filters_enabled)) {
@@ -210,7 +210,7 @@ function DashboardService($resource, $http, $location, currentUser) {
       }
     });
     return _.values(_.each(globalParams, (param) => {
-      param.setValue(param.getValue()); // apply global param value to all locals
+      param.setValue(param.value); // apply global param value to all locals
       param.fromUrlParams(queryParams); // try to initialize from url (may do nothing)
     }));
   };
